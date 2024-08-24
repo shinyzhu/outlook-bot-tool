@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+import logging
 import httpx
 import msal
 
@@ -16,10 +17,12 @@ import msal
 # Graph explorer
 # https://developer.microsoft.com/en-us/graph/graph-explorer
 
+logging.basicConfig(level=logging.INFO)
+
 
 def auth():
-    client_id = os.getenv("OUTLOOK_CLIENT_ID")
-    client_secret = os.getenv("OUTLOOK_CLIENT_SECRET")
+    client_id = os.getenv("OUTLOOK_CLIENT_ID_1")
+    client_secret = os.getenv("OUTLOOK_CLIENT_SECRET_1")
 
     authority = f"https://login.microsoftonline.com/consumers"
     scopes = ["https://graph.microsoft.com/.default"]
@@ -29,19 +32,54 @@ def auth():
         authority=authority,
         client_credential=client_secret,
     )
+    # The pattern to acquire a token looks like this.
+    result = None
 
-    result = app.acquire_token_for_client(scopes=scopes)
+    # First, the code looks up a token from the cache.
+    # Because we're looking for a token for the current app, not for a user,
+    # use None for the account parameter.
+    result = app.acquire_token_silent(scopes, account=None)
+
+    if not result:
+        logging.info("No suitable token exists in cache. Let's get a new one.")
+        result = app.acquire_token_for_client(scopes)
 
     if "access_token" in result:
         access_token = result["access_token"]
-        print(f"Access token acquired: {access_token}")
-        print(result)
+        logging.info(result)
     else:
-        print("Error acquiring token:", result.get("error_description"))
+        logging.error("Error acquiring token:", result.get("error_description"))
+
+    return access_token
+
+
+def get_me():
+    access_token = auth()
+    if not access_token:
+        logging.error("Access token not acquired.")
+        return
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json",
+    }
+
+    # Example API call using httpx
+    with httpx.Client() as client:
+        response = client.get(
+            "https://graph.microsoft.com/v1.0/me",
+            headers=headers,
+        )
+
+        if response.status_code == 200:
+            print(response.json())
+        else:
+            print("Error:", response.text)
 
 
 def main():
-    auth()
+    # auth()
+    get_me()
 
 
 if __name__ == "__main__":
