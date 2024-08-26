@@ -8,14 +8,12 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-import httpx
-import msal
+from outlook_auth import auth_device_flow
 
 import imaplib, smtplib, email
 from email.header import decode_header
-
-from file_token_cache import FileTokenCache
-from outlook_auth import auth_device_flow
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 def decode_str(string):
@@ -25,8 +23,7 @@ def decode_str(string):
     return decoded
 
 
-# see: https://blog.bytescrum.com/how-to-get-and-send-email-in-python-using-imap-and-smtp
-def fetch_emails_and_attachments():
+def fetch_emails():
     imap_server = os.getenv("OUTLOOK_IMAP_SERVER")
     imap_port = os.getenv("OUTLOOK_IMAP_PORT")
     user_email = os.getenv("OUTLOOK_USERNAME")
@@ -50,39 +47,41 @@ def fetch_emails_and_attachments():
                 print(f"From: {msg['From']}")
                 print(f"Date: {msg['Date']}")
 
+    imap_conn.close()
+    imap_conn.logout()
+
 
 def send_email():
     access_token = auth_device_flow()
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Accept": "application/json",
-    }
 
-    email_data = {
-        "message": {
-            "subject": "Test Email Again",
-            "body": {"contentType": "Text", "content": "This is a test email."},
-            "toRecipients": [{"emailAddress": {"address": "shiny@shinyzhu.com"}}],
-        }
-    }
+    me_mail = os.getenv("OUTLOOK_USERNAME")
 
-    response = httpx.post(
-        "https://graph.microsoft.com/v1.0/me/sendMail",
-        headers=headers,
-        json=email_data,
+    msg = MIMEMultipart()
+    msg["From"] = me_mail
+    msg["To"] = "shinyzhu@outlook.com"
+    msg["Subject"] = "Test Email Again"
+    msg.attach(MIMEText("Hey it's good to see you again.", "plain"))
+
+    smtp_conn = smtplib.SMTP(
+        os.getenv("OUTLOOK_SMTP_SERVER"), os.getenv("OUTLOOK_SMTP_PORT")
+    )
+    smtp_conn.starttls()
+    smtp_conn.ehlo()
+    smtp_conn.auth(
+        "XOAUTH2",
+        lambda: f"user={me_mail}\1auth=Bearer {access_token}\1\1",
     )
 
-    if response.status_code == 202:
-        print("📧 Email sent successfully!")
-    else:
-        print("❌ Error sending email:", response.text)
+    smtp_conn.send_message(msg)
+    print(f"Email sent")
+
+    smtp_conn.quit()
 
 
 def main():
-    fetch_emails_and_attachments()
-
-
-# send_email()
+    # Follow the console info to login
+    fetch_emails()
+    send_email()
 
 
 if __name__ == "__main__":

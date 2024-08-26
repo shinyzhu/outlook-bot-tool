@@ -5,7 +5,7 @@ load_dotenv()
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 import msal
 
@@ -72,36 +72,34 @@ def auth_device_flow():
 
     # Else, Initiate device code flow
     flow = app.initiate_device_flow(scopes=scopes)
-    if flow is None:
-        logging.error("❌ Error initiating device flow")
-        return None
-    elif "error" in flow:
+    if "user_code" not in flow:
         logging.error("❌ Error initiating device flow")
         logging.error(flow.get("error"))
         logging.error(flow.get("error_description"))
         return None
-    else:
-        logging.info("🔑 Device code flow initiated")
+
+    logging.info("🔑 Device code flow initiated")
+    print(flow["message"])
+    print("\n----------------------------------------------------")
+    print(f"Open: {flow['verification_uri']}")
+    print(f"Code: {flow['user_code']}")
+    print("----------------------------------------------------\n")
 
     result = app.acquire_token_by_device_flow(flow)
 
-    token_cache.save_cache()
-    print(result)
-
     if "access_token" in result:
         logging.info(f"🔐 Token acquired from remote")
+        token_cache.save_cache()
         return result["access_token"]
     else:
         logging.error("❌ Error acquiring token.")
         logging.error(result.get("error"))
         logging.error(result.get("error_description"))
-
-    # return nothing
-    return None
+        return None
 
 
 def print_usage():
-    print("Usage: python3 outlook_auth.py")
+    print("Usage: from outlook_auth import auth_device_flow")
 
 
 if __name__ == "__main__":
