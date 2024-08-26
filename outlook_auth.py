@@ -11,15 +11,6 @@ import msal
 
 from file_token_cache import FileTokenCache
 
-# Configure your IMAP server settings:
-# https://support.microsoft.com/en-us/office/pop-imap-and-smtp-settings-for-outlook-com-d088b986-291d-42b8-9564-9c414e2aa040
-
-# modern auth
-# https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
-
-# Graph explorer
-# https://developer.microsoft.com/en-us/graph/graph-explorer
-
 
 def auth_device_flow():
     """
