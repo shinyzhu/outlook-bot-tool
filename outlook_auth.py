@@ -89,9 +89,5 @@ def auth_device_flow():
         return None
 
 
-def print_usage():
-    print("Usage: from outlook_auth import auth_device_flow")
-
-
 if __name__ == "__main__":
-    print_usage()
+    print("Usage: from outlook_auth import auth_device_flow")
