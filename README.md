@@ -145,3 +145,8 @@ You need to open the page and follow the form to enter the code.
 ![outlook_device_code_login_1](README/outlook_device_code_login_1.png)
 
 When done. You'll see the output keeps going. And the token is cached to local file `token_cache.json` alongside your script. It'll retrieve from the cache next time.
+
+## Resources
+
+Office/Exchange Doc: [Authenticate an IMAP, POP or SMTP connection using OAuth](https://learn.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
+
