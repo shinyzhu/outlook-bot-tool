@@ -146,6 +146,24 @@ You need to open the page and follow the form to enter the code.
 
 When done. You'll see the output keeps going. And the token is cached to local file `token_cache.json` alongside your script. It'll retrieve from the cache next time.
 
+## FAQ (Problems)
+
+### No Default Directory for your account
+
+> **Register an application**
+>
+> The ability to create applications outside of a directory has been deprecated. You may get a new directory by [joining the M365 Developer Program](https://aka.ms/joinM365DeveloperProgram) or [signing up for Azure](https://aka.ms/signUpForAzure).
+
+But you will get:
+
+> Thank you for joining. You don't current qualify for a Microsoft 365 Developer Program sandbox subscription.
+
+Find out more [here](https://learn.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program-faq).
+
+You can successfuly logged into the [Azure Portal](https://portal.azure.com) but you don't have any Directory. I can't pass the **Identity verification by card** step.
+
+Or join the [Visual Studio Dev Essentials](https://visualstudio.microsoft.com/dev-essentials/)? I don't know if can get a directory. LOL
+
 ## Resources
 
 - Office/Exchange Doc: [Authenticate an IMAP, POP or SMTP connection using OAuth](https://learn.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
