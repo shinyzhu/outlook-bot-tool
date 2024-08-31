@@ -58,10 +58,10 @@ def send_email():
 
     msg = MIMEMultipart()
     msg["From"] = me_mail
-    msg["To"] = "your.friends@outlook.com"
+    msg["To"] = os.getenv("OUTLOOK_TO")
     msg["Subject"] = "Meet for lunch?"
     msg.attach(
-        MIMEText("Hey it's good to see you again. Let's meet for lunch now.", "plain")
+        MIMEText("Hey it's good to see you again. Let's meet for lunch today.", "plain")
     )
 
     smtp_conn = smtplib.SMTP(
